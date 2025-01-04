@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
-	"sync"
 	"time"
 )
 
@@ -13,11 +12,11 @@ import (
 
 func main() {
 
-	var wg sync.WaitGroup
-
 	args := os.Args
 
 	var length int
+
+	UpdateArrChan := make(chan [][]string)
 
 	if len(args) > 1 {
 		length, _ = strconv.Atoi(args[1])
@@ -45,11 +44,16 @@ func main() {
 	}
 
 	// One goroutine to refresh and print the screen
-	wg.Add(1)
-	go refreshAndPrint(arr, 300, &wg)
 
-	// Wait for the goroutine to finish (which won't happen unless we add termination logic)
-	wg.Wait()
+	go refreshAndPrint(UpdateArrChan, 300)
+	time.Sleep(1000)
+	UpdateArrChan <- arr
+
+	// MAIN EVENT LOOP (i think thats what this is called), Simulate dynamic updates to the array
+	for {
+		// Send the updated array to the channel
+		UpdateArrChan <- arr
+	}
 
 }
 
@@ -64,10 +68,9 @@ func printarr(arr [][]string) {
 
 
 // refreshAndPrint clears the screen and prints the array to simulate refreshing.
-func refreshAndPrint(arr [][]string, refreshRateMS int, wg *sync.WaitGroup) {
-	defer wg.Done() // Ensure this is called when the goroutine finishes
+func refreshAndPrint(UpdateArrChan <- chan [][]string, refreshRateMS int) {
 
-	for {
+	for arr := range UpdateArrChan {
 		// clears the screen
 		c := exec.Command("clear")
 		c.Stdout = os.Stdout
@@ -85,3 +88,4 @@ func refreshAndPrint(arr [][]string, refreshRateMS int, wg *sync.WaitGroup) {
 		time.Sleep(time.Duration(refreshRateMS) * time.Millisecond)
 	}
 }
+
