@@ -5,6 +5,8 @@ import (
 	"os"
 	"os/exec"
 	"time"
+	"bufio"
+	"strings"
 )
 
 const (
@@ -31,15 +33,20 @@ var (
 
 func main() {
 	// Create a 2D slice of strings of that length
-	arr := createArr(rows, cols)
+	Basearr := createArr(rows, cols)
 
 	// Create a channel to update the 2D array
 	UpdateArrChan := make(chan [][]string)
 
+	// Create inpput channel to take input from user, map that to directions, move the snake accoringly
+	InputChan := make(chan string)
+
 	// One goroutine to refresh and print the screen
 	go refreshAndPrint(UpdateArrChan, refreshRate)
 	time.Sleep(1000)
-	UpdateArrChan <- arr
+	UpdateArrChan <- Basearr
+
+	go getInputViaChan(InputChan)
 
 	// test
 	// testSnakeRun(UpdateArrChan, arr)
@@ -52,17 +59,28 @@ func main() {
 		{1,2},
 	}
 
+	arr := deepCopyArr(Basearr)
+
 	for {
+		select {
 		// take input and move snake
+		case newDirection := <-InputChan:
+			currentDirection = newDirection
 
-		// update the snake in updateArrchan to print
-		for _, body := range snake {
-			arr[body[0]][body[1]] = snakeBody
+		case <-time.After(refreshRate):
+			// Move the snake in the current direction
+			snake = UpdateSnake(snake, currentDirection)
+
+			// Draw the snake
+			for _, body := range snake {
+				arr[body[0]][body[1]] = snakeBody
+			}
+			arr[snake[0][0]][snake[0][1]] = snakeHead
+
+			UpdateArrChan <- arr
+			arr = deepCopyArr(Basearr)
 		}
-		arr[snake[0][0]][snake[0][1]] = snakeHead
-		UpdateArrChan <- arr
 	}
-
 }
 
 func createArr(rows, cols int) [][]string {
@@ -105,6 +123,51 @@ func refreshAndPrint(UpdateArrChan <- chan [][]string, refreshRateMS time.Durati
 		// Sleep for the refresh rate duration
 		time.Sleep(refreshRateMS)
 	}
+}
+
+func getInputViaChan(InputChan chan string) {
+	scanner := bufio.NewScanner(os.Stdin)
+	for scanner.Scan() {
+		text := strings.ToLower(scanner.Text())
+
+		if text == "w" && currentDirection != "down" {
+			InputChan <- "up"
+		} else if text == "s" && currentDirection != "up" {
+			InputChan <- "down"
+		} else if text == "a" && currentDirection != "right" {
+			InputChan <- "left"
+		} else if text == "d" && currentDirection != "left" {
+			InputChan <- "right"
+		}
+	}
+	close(InputChan)
+}
+
+func UpdateSnake(snake [][2]int, currentDirection string) [][2]int {
+	// Get direction offsets
+	offset := directions[currentDirection]
+	head := snake[0]
+
+	// Calculate new head position
+	newHead := [2]int{head[0] + offset[0], head[1] + offset[1]}
+
+	// Add new head to the front of the snake
+	newSnake := append([][2]int{newHead}, snake...)
+
+	// Remove the last part (tail) to simulate movement
+	newSnake = newSnake[:len(newSnake)-1]
+
+	return newSnake
+}
+
+func deepCopyArr(src [][]string) [][]string {
+	// Create a new 2D slice with the same dimensions
+	dst := make([][]string, len(src))
+	for i := range src {
+		dst[i] = make([]string, len(src[i]))
+		copy(dst[i], src[i]) // Copy each row individually
+	}
+	return dst
 }
 
 func testSnakeRun(UpdateArrChan chan [][]string, arr [][]string){
