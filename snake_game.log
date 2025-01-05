@@ -1,0 +1,47 @@
+INFO: 2025/01/05 12:55:52 main.go:45: Logger initialized
+INFO: 2025/01/05 12:56:40 main.go:45: Logger initialized
+INFO: 2025/01/05 12:58:13 main.go:46: Logger initialized
+INFO: 2025/01/05 12:58:30 main.go:46: Logger initialized
+INFO: 2025/01/05 12:58:36 main.go:46: Logger initialized
+INFO: 2025/01/05 12:58:55 main.go:46: Logger initialized
+INFO: 2025/01/05 12:59:40 main.go:51: Logger initialized
+INFO: 2025/01/05 12:59:40 main.go:148: in getInputViaChan
+INFO: 2025/01/05 13:03:28 main.go:53: Logger initialized
+INFO: 2025/01/05 13:03:28 main.go:156: in getInputViaChan
+INFO: 2025/01/05 13:05:13 main.go:53: Logger initialized
+INFO: 2025/01/05 13:05:13 main.go:156: in getInputViaChan
+INFO: 2025/01/05 13:05:14 main.go:91: New direction:  down
+INFO: 2025/01/05 13:05:16 main.go:91: New direction:  down
+INFO: 2025/01/05 13:08:17 main.go:53: Logger initialized
+INFO: 2025/01/05 13:08:17 main.go:156: in getInputViaChan
+INFO: 2025/01/05 13:09:01 main.go:171: Error reading input: read /dev/stdin: input/output error
+INFO: 2025/01/05 13:09:51 main.go:53: Logger initialized
+INFO: 2025/01/05 13:09:51 main.go:156: in getInputViaChan
+INFO: 2025/01/05 13:11:26 main.go:52: Logger initialized
+INFO: 2025/01/05 13:11:26 main.go:153: in getInputViaChan
+INFO: 2025/01/05 13:13:03 main.go:52: Logger initialized
+INFO: 2025/01/05 13:13:03 main.go:155: in getInputViaChan
+INFO: 2025/01/05 13:14:01 main.go:52: Logger initialized
+INFO: 2025/01/05 13:14:01 main.go:155: in getInputViaChan
+INFO: 2025/01/05 13:16:24 main.go:52: Logger initialized
+INFO: 2025/01/05 13:16:24 main.go:155: in getInputViaChan
+INFO: 2025/01/05 13:19:18 main.go:52: Logger initialized
+INFO: 2025/01/05 13:19:18 main.go:155: in getInputViaChan
+INFO: 2025/01/05 13:19:25 main.go:90: New direction:  down
+INFO: 2025/01/05 13:19:29 main.go:90: New direction:  right
+INFO: 2025/01/05 13:19:33 main.go:90: New direction:  down
+INFO: 2025/01/05 13:19:43 main.go:52: Logger initialized
+INFO: 2025/01/05 13:19:43 main.go:155: in getInputViaChan
+INFO: 2025/01/05 13:19:45 main.go:90: New direction:  right
+INFO: 2025/01/05 13:19:46 main.go:90: New direction:  down
+INFO: 2025/01/05 13:19:47 main.go:90: New direction:  right
+INFO: 2025/01/05 13:19:51 main.go:90: New direction:  up
+INFO: 2025/01/05 13:19:51 main.go:90: New direction:  left
+INFO: 2025/01/05 13:19:52 main.go:90: New direction:  down
+INFO: 2025/01/05 13:19:55 main.go:90: New direction:  right
+INFO: 2025/01/05 13:19:56 main.go:90: New direction:  up
+INFO: 2025/01/05 13:19:57 main.go:90: New direction:  left
+INFO: 2025/01/05 13:19:58 main.go:90: New direction:  down
+INFO: 2025/01/05 13:19:59 main.go:90: New direction:  right
+INFO: 2025/01/05 13:20:00 main.go:90: New direction:  up
+INFO: 2025/01/05 13:20:01 main.go:90: New direction:  left

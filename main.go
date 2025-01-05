@@ -1,23 +1,25 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
-	"time"
-	"bufio"
 	"strings"
+	"sync"
+	"time"
 )
 
 const (
-	rows       = 30
-	cols       = 60
-	emptyCell  = " "
-	wallCell   = "#"
-	snakeHead  = "@"
-	snakeBody  = "*"
-	foodCell   = "*"
-	refreshRate = 200 * time.Millisecond 
+	rows        = 30
+	cols        = 60
+	emptyCell   = " "
+	wallCell    = "#"
+	snakeHead   = "@"
+	snakeBody   = "*"
+	foodCell    = "*"
+	refreshRate = 200 * time.Millisecond
 )
 
 var (
@@ -28,10 +30,27 @@ var (
 		"right": {0, 1},
 	}
 	currentDirection = "right"
+	logger           *log.Logger
+	directionMutex   sync.Mutex // Mutex to guard access to currentDirection
 )
 
-
 func main() {
+	// Logger init
+	// Open the log file
+	logFile, err := os.OpenFile("snake_game.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Initialize the global logger
+	logger = log.New(logFile, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
+
+	// Make sure to close the log file when the program exits
+	defer logFile.Close()
+
+	// Example log to test
+	logger.Println("Logger initialized")
+
 	// Create a 2D slice of strings of that length
 	Basearr := createArr(rows, cols)
 
@@ -52,24 +71,31 @@ func main() {
 	// testSnakeRun(UpdateArrChan, arr)
 
 	// actual
-	snake := [][2]int {
-		{1,5},
-		{1,4},
-		{1,3},
-		{1,2},
+	snake := [][2]int{
+		{1, 5},
+		{1, 4},
+		{1, 3},
+		{1, 2},
 	}
 
 	arr := deepCopyArr(Basearr)
 
 	for {
 		select {
-		// take input and move snake
+		// Take input and move snake
 		case newDirection := <-InputChan:
+			// Lock the mutex to ensure safe access to currentDirection
+			directionMutex.Lock()
 			currentDirection = newDirection
+			logger.Println("New direction: ", currentDirection)
+			directionMutex.Unlock()
 
 		case <-time.After(refreshRate):
 			// Move the snake in the current direction
+			// Lock the mutex to ensure safe access to currentDirection
+			directionMutex.Lock()
 			snake = UpdateSnake(snake, currentDirection)
+			directionMutex.Unlock()
 
 			// Draw the snake
 			for _, body := range snake {
@@ -104,7 +130,7 @@ func createArr(rows, cols int) [][]string {
 }
 
 // refreshAndPrint clears the screen and prints the array to simulate refreshing.
-func refreshAndPrint(UpdateArrChan <- chan [][]string, refreshRateMS time.Duration) {
+func refreshAndPrint(UpdateArrChan <-chan [][]string, refreshRateMS time.Duration) {
 
 	for arr := range UpdateArrChan {
 		// clears the screen
@@ -126,6 +152,7 @@ func refreshAndPrint(UpdateArrChan <- chan [][]string, refreshRateMS time.Durati
 }
 
 func getInputViaChan(InputChan chan string) {
+	logger.Println("in getInputViaChan")
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
 		text := strings.ToLower(scanner.Text())
@@ -140,7 +167,6 @@ func getInputViaChan(InputChan chan string) {
 			InputChan <- "right"
 		}
 	}
-	close(InputChan)
 }
 
 func UpdateSnake(snake [][2]int, currentDirection string) [][2]int {
@@ -170,10 +196,10 @@ func deepCopyArr(src [][]string) [][]string {
 	return dst
 }
 
-func testSnakeRun(UpdateArrChan chan [][]string, arr [][]string){
-	
-	for i := 1; i<2*len(arr)-1 ;i++ {
-		time.Sleep(300*time.Millisecond)
+func testSnakeRun(UpdateArrChan chan [][]string, arr [][]string) {
+
+	for i := 1; i < 2*len(arr)-1; i++ {
+		time.Sleep(300 * time.Millisecond)
 		arr[1][i] = "*"
 		UpdateArrChan <- arr
 	}
